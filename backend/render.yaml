@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: watchthis-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: TMDB_API_KEY
+        sync: false
+      - key: TMDB_BASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
