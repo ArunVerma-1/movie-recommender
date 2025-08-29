@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query, HTTPException, Path
 from typing import List
-from app.schemas.movie import Movie, RecommendationRequest
+from app.schemas.movie import Movie, MovieSearchResponse, RecommendationRequest
 from app.services.tmdb_service import tmdb_service
 
 
@@ -247,7 +247,7 @@ async def get_tmdb_configuration():
 
 @router.get("/trending/person/{time_window}")
 async def get_trending_people(
-    time_window: str = Path(default="day", pattern="^(day|week)$", description="Time window for trending: day or week")
+    time_window: str = Path(..., pattern="^(day|week)$", description="Time window for trending: day or week")
 ):
     """Get trending people (actors, directors, etc.)"""
     try:
