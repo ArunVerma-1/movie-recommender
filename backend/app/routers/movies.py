@@ -1,12 +1,14 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Path
 from typing import List
-from app.schemas.movie import Movie, MovieSearchResponse, RecommendationRequest
+from app.schemas.movie import Movie, RecommendationRequest
 from app.services.tmdb_service import tmdb_service
+
 
 router = APIRouter(prefix="/api/movies", tags=["movies"])
 
+
 @router.get("/trending", response_model=List[Movie])
-async def get_trending_movies(time_window: str = Query(default="day", regex="^(day|week)$")):
+async def get_trending_movies(time_window: str = Query(default="day", pattern="^(day|week)$")):
     """Get trending movies - updates in real-time from TMDB"""
     try:
         movies_data = await tmdb_service.get_trending_movies(time_window)
@@ -14,6 +16,7 @@ async def get_trending_movies(time_window: str = Query(default="day", regex="^(d
         return movies
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching trending movies: {str(e)}")
+
 
 @router.get("/popular", response_model=List[Movie])
 async def get_popular_movies():
@@ -25,6 +28,7 @@ async def get_popular_movies():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching popular movies: {str(e)}")
 
+
 @router.get("/upcoming", response_model=List[Movie])
 async def get_upcoming_movies():
     """Get upcoming movies from TMDB"""
@@ -34,6 +38,7 @@ async def get_upcoming_movies():
         return movies
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching upcoming movies: {str(e)}")
+
 
 @router.get("/top-rated", response_model=List[Movie])
 async def get_top_rated_movies():
@@ -45,6 +50,7 @@ async def get_top_rated_movies():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching top rated movies: {str(e)}")
 
+
 @router.get("/now-playing", response_model=List[Movie])
 async def get_now_playing_movies():
     """Get now playing movies from TMDB"""
@@ -54,6 +60,7 @@ async def get_now_playing_movies():
         return movies
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching now playing movies: {str(e)}")
+
 
 @router.get("/search")
 async def search_movies(
@@ -74,6 +81,7 @@ async def search_movies(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error searching movies: {str(e)}")
+
 
 @router.get("/discover")
 async def discover_movies(
@@ -103,6 +111,7 @@ async def discover_movies(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error discovering movies: {str(e)}")
 
+
 @router.get("/{movie_id}")
 async def get_movie_details(movie_id: int):
     """Get detailed movie information including genres, production companies, etc."""
@@ -116,6 +125,7 @@ async def get_movie_details(movie_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching movie details: {str(e)}")
 
+
 @router.get("/{movie_id}/videos")
 async def get_movie_videos(movie_id: int):
     """Get movie videos (trailers, teasers, clips, etc.)"""
@@ -124,6 +134,7 @@ async def get_movie_videos(movie_id: int):
         return videos
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching movie videos: {str(e)}")
+
 
 @router.get("/{movie_id}/credits")
 async def get_movie_credits(movie_id: int):
@@ -134,6 +145,7 @@ async def get_movie_credits(movie_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching movie credits: {str(e)}")
 
+
 @router.get("/{movie_id}/images")
 async def get_movie_images(movie_id: int):
     """Get movie images (posters, backdrops, logos)"""
@@ -142,6 +154,7 @@ async def get_movie_images(movie_id: int):
         return images
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching movie images: {str(e)}")
+
 
 @router.get("/{movie_id}/reviews")
 async def get_movie_reviews(
@@ -154,6 +167,7 @@ async def get_movie_reviews(
         return reviews
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching movie reviews: {str(e)}")
+
 
 @router.get("/{movie_id}/similar")
 async def get_similar_movies(
@@ -174,6 +188,7 @@ async def get_similar_movies(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching similar movies: {str(e)}")
 
+
 @router.post("/recommendations")
 async def get_movie_recommendations(request: RecommendationRequest):
     """Get movie recommendations based on a given movie"""
@@ -184,6 +199,7 @@ async def get_movie_recommendations(request: RecommendationRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching recommendations: {str(e)}")
 
+
 @router.get("/genres/list")
 async def get_movie_genres():
     """Get list of all movie genres"""
@@ -192,6 +208,7 @@ async def get_movie_genres():
         return genres
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching movie genres: {str(e)}")
+
 
 @router.get("/person/{person_id}")
 async def get_person_details(person_id: int):
@@ -206,6 +223,7 @@ async def get_person_details(person_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching person details: {str(e)}")
 
+
 @router.get("/person/{person_id}/movie_credits")
 async def get_person_movie_credits(person_id: int):
     """Get movie credits for a person"""
@@ -214,6 +232,7 @@ async def get_person_movie_credits(person_id: int):
         return credits
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching person movie credits: {str(e)}")
+
 
 # Additional utility endpoints
 @router.get("/configuration")
@@ -225,14 +244,18 @@ async def get_tmdb_configuration():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching configuration: {str(e)}")
 
+
 @router.get("/trending/person/{time_window}")
-async def get_trending_people(time_window: str = Query(default="day", regex="^(day|week)$")):
+async def get_trending_people(
+    time_window: str = Path(default="day", pattern="^(day|week)$", description="Time window for trending: day or week")
+):
     """Get trending people (actors, directors, etc.)"""
     try:
         people_data = await tmdb_service.get_trending_people(time_window)
         return people_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching trending people: {str(e)}")
+
 
 @router.get("/collection/{collection_id}")
 async def get_movie_collection(collection_id: int):
@@ -246,6 +269,7 @@ async def get_movie_collection(collection_id: int):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching movie collection: {str(e)}")
+
 
 # Health check endpoint for this router
 @router.get("/health")
