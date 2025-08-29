@@ -263,3 +263,5 @@ class TMDBService:
             except Exception as e:
                 print(f"Error in get_movie_collection: {e}")
                 return {}
+
+tmdb_service = TMDBService()
